@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlalchemy
+python-multipart
+python-dotenv
+python-jose
+passlib
+bcrypt
+orjson
+pycopg2-binary
+pydantic[email]
+alembic

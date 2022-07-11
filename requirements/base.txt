@@ -7,6 +7,6 @@ python-jose
 passlib
 bcrypt
 orjson
-pycopg2-binary
+psycopg2-binary
 pydantic[email]
 alembic

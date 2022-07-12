@@ -22,7 +22,7 @@ def get_db():
 
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="token"
+    tokenUrl="login"
     #Scopes [Authorization]
     )
 

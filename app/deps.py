@@ -10,7 +10,6 @@ from app.user.schemas import User
 from app.database import SessionLocal
 from app.user.services import UserManager, UserPermissionManager
 from sqlalchemy.orm import Session
-from app.scopes import scopes_db
 
 # FastAPI Dependencies: https://fastapi.tiangolo.com/tutorial/dependencies/
 def get_db():

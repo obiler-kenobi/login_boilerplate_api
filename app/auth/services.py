@@ -9,8 +9,10 @@ from app.user.schemas import UserAuthenticate
 
 
 SECRET_KEY = "8aff20dc5d697a58bec3cf507be78976946ecbfefae32cd9d2eb3b89e7e0d314"
+REFRESH_SECRET_KEY = "c4aa0840ddcb425ab5bd6ca58d1a98da9da9d5c7d59435386f004a218ccf6569"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRES_MINUTES = 1
+REFRESH_TOKEN_EXPIRES_MINUTES = 30
 
 fake_users_db = {
     "johndoe": {
@@ -58,8 +60,18 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=1)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def create_refresh_token(data: dict, expires_delta: Union[timedelta, None] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=30)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, REFRESH_SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 

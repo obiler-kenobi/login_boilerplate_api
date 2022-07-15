@@ -55,5 +55,5 @@ def create_user_permission(user_permission: UserPermissionBase, db: Session = De
     status_code=status.HTTP_200_OK
 )
 def get_permission_scopes(db: Session = Depends(get_db)):
-    return 
+    return None
 

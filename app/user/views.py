@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, Security, status
 from sqlalchemy.orm import Session
+from fastapi_jwt_auth import AuthJWT
 
 from app.user.schemas import User, UserAuthenticate, UserCreate, UserPermission, UserPermissionBase
 from app.deps import get_current_active_user, get_current_user, get_db, get_scopes
@@ -10,8 +11,13 @@ from app.user.services import UserManager, UserPermissionManager
 user_router = APIRouter()
 
 @user_router.get("/me/", response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
+async def user(db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+
+    current_user = UserManager.get_user_by_username(db, Authorize.get_jwt_subject())
     return current_user
+#async def read_users_me(current_user: User = Depends(get_current_active_user)):
+#    return current_user
 
 @user_router.get("/me/items/")
 async def read_own_items(current_user: User = Security(get_current_active_user, scopes=["items"])):

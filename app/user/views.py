@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, Security, status
+from fastapi import APIRouter, Depends, HTTPException, Security, status
 from sqlalchemy.orm import Session
 from fastapi_jwt_auth import AuthJWT
 
@@ -14,8 +14,22 @@ user_router = APIRouter()
 async def user(db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
     current_user = UserManager.get_user_by_username(db, Authorize.get_jwt_subject())
+    
+    if current_user is None:
+        raise credentials_exception
+    
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    
     return current_user
+
 #async def read_users_me(current_user: User = Depends(get_current_active_user)):
 #    return current_user
 

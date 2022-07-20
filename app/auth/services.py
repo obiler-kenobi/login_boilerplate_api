@@ -35,8 +35,6 @@ fake_users_db = {
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
-
 def get_user_authenticated(db, username: str):
         if username in db:
             user_dict = db[username]

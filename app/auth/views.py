@@ -37,7 +37,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 
 @auth_router.post("/refresh")
 def refresh(Authorize: AuthJWT = Depends()):
-    #Authorize.jwt_refresh_token_required()
+    Authorize.jwt_refresh_token_required()
 
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)

@@ -41,7 +41,8 @@ def refresh(Authorize: AuthJWT = Depends()):
 
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
-    return {"access_token": new_access_token}
+    new_refresh_token = Authorize.create_refresh_token(subject=current_user)
+    return {"access_token": new_access_token, "refresh_token": new_refresh_token}
 
 @auth_router.get("/sample")
 def sample(Authorize: AuthJWT = Depends()):

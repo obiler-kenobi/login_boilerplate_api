@@ -28,33 +28,31 @@ oauth2_scheme = OAuth2PasswordBearer(
     )
 
 async def get_current_user(
-    #Scopes [Authorization]
     security_scopes: SecurityScopes,
-    token: str = Depends(oauth2_scheme),
+    Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
     else:
         authenticate_value = f"Bearer"
 
     credentials_exception = HTTPException(
-
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="could not validate credentials",
         headers={"WWW-Authenticate": authenticate_value},
     )
+    
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        username: str = Authorize.get_jwt_subject()
         if username is None:
             raise credentials_exception
-        token_scopes = ["me","create_user"]
+        token_scopes = ["me","create_user","sample"]
         token_data = TokenData(scopes=token_scopes, username=username)
     except (JWTError, ValidationError):
         raise credentials_exception
 
-    users_db = fake_users_db
-    user = get_user_authenticated(users_db, username=token_data.username)
     user = UserManager.get_user_by_username(db, username=token_data.username)
     if user is None:
         raise credentials_exception
@@ -67,18 +65,7 @@ async def get_current_user(
             )
     return user
 
-async def get_current_active_user(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    
-    current_user = UserManager.get_user_by_username(db, username=Authorize.get_jwt_subject)
-    
-    if current_user is None:
-        raise credentials_exception
-    
+async def get_current_active_user(current_user: User = Security(get_current_user, scopes=["sample"])):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     
